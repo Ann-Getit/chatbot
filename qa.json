@@ -1,0 +1,45 @@
+{
+  "default": "Sorry, dat begrijp ik niet. Kun je het anders vragen?",
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["hallo", "hoi", "hey", "goedendag", "hi", "hello"],
+      "response": "Hoi! Hoe gaat het met je?"
+    },
+    {
+      "tag": "how_are_you",
+      "patterns": ["hoe gaat het", "hoe gaat 't", "alles goed"],
+      "response": "Met mij gaat het goed! En met jou?"
+    },
+    {
+      "tag": "name",
+      "patterns": ["wat is je naam", "hoe heet je", "wie ben jij"],
+      "response": "Ik ben je eenvoudige chatbot 🤖"
+    },
+    {
+      "tag": "questions",
+      "patterns": ["wat zijn de openingstijden?"],
+      "response": "maandag t/m donderdag van 11:00 uur - 18:00 uur. vrijdag t/m zondag van 13:00 uur - 20:00 uur"
+    },
+    {
+      "tag": "questions",
+      "patterns": ["hoe kan ik mijn wachtwoord resetten?"],
+      "response": "neem hiervoor contact op met 4395838395. je krijgt spoedig een reset mail."
+    },
+    {
+      "tag": "questions",
+      "patterns": ["kan ik een afspraak maken?"],
+      "response": "ja, dat kan via ......"
+    },
+    {
+      "tag": "questions",
+      "patterns": ["wat kost jullie service?"],
+      "response": "al onze prijzen van service en product kun je vinden o...."
+    },
+    {
+      "tag": "questions",
+      "patterns": ["waar kan ik mijn afspraak annuleren?"],
+      "response": "annuleren doe je op de ........"
+    }
+  ]
+}

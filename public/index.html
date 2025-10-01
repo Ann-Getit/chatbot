@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+  <div id="signup-form-container">
+  <form id="signup-form">
+    <input type="text" id="signup-name" placeholder="Naam" required />
+    <input type="email" id="signup-email" placeholder="Email" required />
+    <input type="password" id="signup-password" placeholder="Wachtwoord" required />
+    <button type="submit">Registreer</button>
+  <p class="form-link">Al een account? <a href="#" id="show-login">Login hier</a></p>
+  </form>
+</div>
+
+  <div id="login-form-container">
+   <form id="login-form">
+  <input type="email" id="login-email" placeholder="Email" required />
+  <input type="password" id="login-password" placeholder="Wachtwoord" required />
+  <button type="submit">Login</button>
+  <p class="form-link">Nog geen account? <a href="#" id="show-signup">Registreer hier</a></p>
+  </form>
+</div>
+
+<div id="chat-container" class="chat-container" style="display: none;">
+    <div id="messages" class="messages"></div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Typ je bericht..." autocomplete="off" />
+      <button type="submit">Verstuur</button>
+    </form>
+    <div id="prompts" class="prompts"></div>
+    </div>
+
+
+  
+
+    <script>
+ 
+    // frontend 
+
+    
+
+ let currentUserId = null;
+
+
+const signupForm = document.getElementById('signup-form');
+const loginForm = document.getElementById('login-form');
+const form = document.getElementById('chat-form');
+const input = document.getElementById('chat-input');
+const messages = document.getElementById('messages');
+const chatContainer = document.querySelector('.chat-container');
+chatContainer.style.display = 'none'; // standaard verbergen
+
+const showLoginLink = document.getElementById('show-login');
+const showSignupLink = document.getElementById('show-signup');
+
+
+
+const suggestedPrompts = [
+  "Wat zijn de openingstijden?",
+  "Hoe kan ik mijn wachtwoord resetten?",
+  "Kan ik een afspraak maken?",
+  "Wat kost jullie service?",
+  "waar kan ik mijn afspraak annuleren?"
+];
+
+// --- Event listeners voor toggling signup/login ---
+showLoginLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  showView('login-form-container');
+});
+
+showSignupLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  showView('signup-form-container');
+});
+
+
+// Functie om een view te tonen en de rest te verbergen
+function showView(viewId) {
+  const views = ['signup-form-container', 'login-form-container', 'chat-container'];
+  views.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = (id === viewId ? 'block' : 'none');
+    } else {
+      console.warn('Element niet gevonden:', id);
+    }
+  });
+}
+
+ function scrollToBottom() {
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function renderPrompts() {
+  const promptsContainer = document.getElementById('prompts');
+  promptsContainer.innerHTML = ''; // reset container
+  suggestedPrompts.forEach(text => {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    btn.classList.add('prompt-btn'); // voor styling
+    btn.addEventListener('click', () => sendMessage(text)); // dit gebruiken we als de gebruiker klikt
+    promptsContainer.appendChild(btn);
+  });
+}
+
+
+//SIGN-UP ------------
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+     
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+
+
+  try {
+    const res = await fetch("http://127.0.0.1:5500/api/register", {//klopt url ?
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(`Gebruiker aangemaakt! Je kunt nu inloggen.`);
+      showView('login-form-container');
+    } else {
+      alert(`Signup mislukt: ${data.error}`);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Er ging iets mis bij registreren.');
+  }
+});
+
+
+// voorbeeld login (moet met echte login form)
+async function login(email, password) {
+  try {
+  const res = await fetch("http://127.0.0.1:5500/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+
+ if (!res.ok) {
+      const errData = await res.json();
+      alert(`Login mislukt: ${errData.error}`);
+      return false;
+    }
+
+  const data = await res.json();
+  currentUserId = data.userId;
+      return true;
+
+  } catch (err) {
+    console.error(err);
+    alert('Er ging iets mis bij login.');
+    return false;
+  }
+}
+
+
+// login listener
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  const success = await login(email, password);
+  if (!success) return;
+
+  alert('Ingelogd! Je kunt nu chatten.');
+  showView('chat-container'); // alles netjes switchen
+  input.focus();
+  // prompts renderen
+  renderPrompts(); // prompts tonen
+});
+
+// --- CHAT ---
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const userMassage = input.value.trim();
+  sendMessage(userMassage);
+});
+
+// Functie om een bericht te sturen
+async function sendMessage(messageText) { //als we async hebben waarom gebruiken we geen await
+  if (!currentUserId || !messageText) {
+    alert('Je moet eerst inloggen en iets typen!');
+    return;
+  }
+
+
+  messages.innerHTML += `<div class="message user"><strong>Jij:</strong> ${messageText}</div>`;
+  scrollToBottom();
+
+  const sendButton = form.querySelector('button'); // knop definiëren
+  sendButton.disabled = true; // knop tijdelijk uitschakelen
+  sendButton.textContent = 'Versturen...';
+
+  try {
+   const res = await fetch("http://127.0.0.1:5500/api/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: messageText, userId: currentUserId }) 
+});
+
+
+    const data = await res.json();
+    messages.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${data.reply}</div>`;
+    scrollToBottom();
+
+  } catch (err) {
+    messages.innerHTML += `<div><strong>Bot:</strong> Sorry, er ging iets mis.</div>`;
+    console.error(err);
+
+  } finally {
+    sendButton.textContent = 'Verstuur';
+    sendButton.disabled = false;
+    input.value = '';
+
+  }
+}
+
+    </script>
+
+
+
+</body>
+</html>
+
