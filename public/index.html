@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+message
+<div class="chat-container">
+    <div id="messages" ></div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Typ je bericht..." autocomplete="off" />
+      <button type="submit">Verstuur</button>
+    </form>
+    <div id="prompts"></div>
+    </div>
+
+
+  
+
+    <script>
+ 
+    // frontend 
+
+
+ 
+const form = document.getElementById('chat-form');
+const input = document.getElementById('chat-input');
+const messages = document.getElementById('messages');
+const promptsContainer = document.getElementById('prompts');
+
+
+const suggestedPrompts = [
+  "Wat zijn de openingstijden?",
+  "Hoe kan ik mijn wachtwoord resetten?",
+  "Kan ik een afspraak maken?",
+  "Wat kost jullie service?",
+  "waar kan ik mijn afspraak annuleren?"
+];
+
+// 
+
+
+// Functie om een view te tonen en de rest te verbergen
+
+
+ function scrollToBottom() {
+  messages.scrollTop = messages.scrollHeight;
+}
+function renderPrompts() {
+  promptsContainer.innerHTML = '';
+  suggestedPrompts.forEach(text => {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    btn.classList.add('prompt-btn');
+    btn.addEventListener('click', () => sendMessage(text));
+    promptsContainer.appendChild(btn);
+  });
+}
+renderPrompts();
+
+// --- CHAT ---
+async function sendMessage(msg) {
+  if (!msg) return;
+
+  messages.innerHTML += `<div class="message user"><strong>Jij:</strong> ${msg}</div>`;
+  scrollToBottom();
+
+  const btn = form.querySelector('button'); // knop definiëren
+  btn.disabled = true; // knop tijdelijk uitschakelen
+  btn.textContent = 'Versturen...';
+
+
+
+  try {
+   const res = await fetch('/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: msg }) 
+});
+
+
+const data = await res.json();
+
+messages.innerHTML += `
+  <div class="message bot">
+    <strong>Bot:</strong> ${data.reply}
+  </div>
+`;
+
+
+   /*const data = await res.json();
+    messages.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${data.reply}</div>`;
+    scrollToBottom();*/
+
+
+  } catch (err) {
+    messages.innerHTML += `<div class="message bot"><strong>Bot:</strong> Sorry, er ging iets mis.</div>`;
+    console.error(err);
+
+
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verstuur';
+    input.value = '';
+
+  }
+}
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const msg = input.value.trim();
+  sendMessage(msg);
+});
+
+
+    </script>
+</body>
+</html>
+

@@ -12,6 +12,11 @@
       "response": "Met mij gaat het goed! En met jou?"
     },
     {
+      "tag": "how_are_",
+      "patterns": ["goed en met jou?", "goed", "goed met jou?"],
+      "response": "goed. Waar kan ik u mee helpen?"
+    },
+    {
       "tag": "name",
       "patterns": ["wat is je naam", "hoe heet je", "wie ben jij"],
       "response": "Ik ben je eenvoudige chatbot 🤖"
