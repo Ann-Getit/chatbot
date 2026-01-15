@@ -8,18 +8,18 @@
 </head>
 <body>
 
-message
+
 <div class="chat-container">
     <div id="messages" ></div>
     <form id="chat-form">
       <input type="text" id="chat-input" placeholder="Typ je bericht..." autocomplete="off" />
       <button type="submit">Verstuur</button>
     </form>
+
+
+
     <div id="prompts"></div>
     </div>
-
-
-  
 
     <script>
  
@@ -56,12 +56,18 @@ function renderPrompts() {
     const btn = document.createElement('button');
     btn.textContent = text;
     btn.classList.add('prompt-btn');
-    btn.addEventListener('click', () => sendMessage(text));
+    
+    btn.addEventListener('click', () => { 
+      document.querySelectorAll('.prompt-btn').forEach(b => b.disabled = true);
+      sendMessage(text).then(() => {
+        document.querySelectorAll('.prompt-btn').forEach(b => b.disabled = false);
+  });
+});
     promptsContainer.appendChild(btn);
   });
 }
 renderPrompts();
-
+ 
 // --- CHAT ---
 async function sendMessage(msg) {
   if (!msg) return;
@@ -90,11 +96,8 @@ messages.innerHTML += `
     <strong>Bot:</strong> ${data.reply}
   </div>
 `;
+//scrollToBottom(); fix the scroll bottom make it also happend for bot messages.
 
-
-   /*const data = await res.json();
-    messages.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${data.reply}</div>`;
-    scrollToBottom();*/
 
 
   } catch (err) {
