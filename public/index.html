@@ -64,8 +64,6 @@ function renderPrompts() {
       if (isLoading) return;      // ❌ negeer snelle extra clicks
       isLoading = true;           // 🔒 start van "fetch loopt"
 
-       btn.disabled = true;
-
       document.querySelectorAll('.prompt-btn').forEach(b => b.disabled = true);
       sendMessage(text).finally(() => {
         document.querySelectorAll('.prompt-btn').forEach(b => b.disabled = false);
