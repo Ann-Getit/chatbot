@@ -50,6 +50,9 @@ const suggestedPrompts = [
  function scrollToBottom() {
   messages.scrollTop = messages.scrollHeight;
 }
+
+let isLoading = false;
+
 function renderPrompts() {
   promptsContainer.innerHTML = '';
   suggestedPrompts.forEach(text => {
@@ -58,9 +61,13 @@ function renderPrompts() {
     btn.classList.add('prompt-btn');
     
     btn.addEventListener('click', () => { 
+      if (isLoading) return;      // ❌ negeer snelle extra clicks
+      isLoading = true;           // 🔒 start van "fetch loopt"
+
       document.querySelectorAll('.prompt-btn').forEach(b => b.disabled = true);
-      sendMessage(text).then(() => {
+      sendMessage(text).finally(() => {
         document.querySelectorAll('.prompt-btn').forEach(b => b.disabled = false);
+         isLoading = false;
   });
 });
     promptsContainer.appendChild(btn);
