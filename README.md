@@ -1,4 +1,4 @@
-This project is a serverless reactive chatbot built with HTML, CSS AND JavaScript, using backend API.
+This project is a serverless reactive chatbot built with HTML, CSS and JavaScript, using backend API.
 
 I started by creating basic structure for the chat interface using HTML.
 Structures for:
